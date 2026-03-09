@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Base API instance
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://citi-solve-rzec.onrender.com/api",
 });
 
 // Add token automatically to every request
