@@ -1,269 +1,244 @@
+// // 
+// import React, { useEffect, useState } from "react";
+// import { complaintsAPI } from "../services/api";
+
+// const AllComplaints = () => {
+//   const [complaints, setComplaints] = useState([]);
+
+//   useEffect(() => {
+//     fetchComplaints();
+//   }, []);
+
+//   const fetchComplaints = async () => {
+//     try {
+//       const data = await complaintsAPI.getComplaints();
+//       setComplaints(data || []);
+//     } catch (error) {
+//       console.error("Error fetching complaints:", error);
+//     }
+//   };
+
+//   const handleStatusUpdate = async (id, status) => {
+//     try {
+//       await complaintsAPI.updateStatus(id, status);
+//       // refresh complaints
+//       const data = await
+//       complaintsAPI.getComplaints();
+//       setComplaints(data);
+//     } catch (error) {
+//       console.error("Error updating complaint:", error);
+//     }
+//   };
+
+//   return (
+//     <div className="all-complaints-container">
+//       <h2>All Complaints</h2>
+
+//       {complaints.length === 0 ? (
+//         <p>No complaints found</p>
+//       ) : (
+//         <table className="complaints-table">
+//           <thead>
+//             <tr>
+//               <th>Name</th>
+//               <th>Ward</th>
+//               <th>Location</th>
+//               <th>Category</th>
+//               <th>Description</th>
+//               <th>Status</th>
+//             </tr>
+//           </thead>
+
+//           <tbody>
+//             {complaints.map((complaint) => (
+//               <tr key={complaint._id}>
+//                 <td>{complaint.name}</td>
+//                 <td>{complaint.ward}</td>
+//                 <td>{complaint.location}</td>
+//                 <td>{complaint.category}</td>
+//                 <td>{complaint.description}</td>
+
+//                 <td>
+//                   <select
+//                     value={complaint.status}
+//                     onChange={(e) =>
+//                       handleStatusUpdate(complaint._id, e.target.value)
+//                     }
+//                   >
+//                     <option value="Pending">Pending</option>
+//                     <option value="In Progress">In Progress</option>
+//                     <option value="Resolved">Resolved</option>
+//                   </select>
+//                 </td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </table>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default AllComplaints;
+// import React, { useEffect, useState } from "react";
+// import { complaintsAPI } from "../services/api";
+
+// const AllComplaints = () => {
+//   const [complaints, setComplaints] = useState([]);
+
+//   useEffect(() => {
+//     fetchComplaints();
+//   }, []);
+
+//   const fetchComplaints = async () => {
+//     try {
+//       const data = await complaintsAPI.getComplaints();
+//       setComplaints(data || []);
+//     } catch (error) {
+//       console.error("Error fetching complaints:", error);
+//     }
+//   };
+
+//   const handleStatusUpdate = async (id, status) => {
+//     try {
+//       await complaintsAPI.updateStatus(id, status);
+//       // refresh complaints
+//       const data = await
+//       complaintsAPI.getComplaints();
+//       setComplaints(data);
+//     } catch (error) {
+//       console.error("Error updating complaint:", error);
+//     }
+//   };
+
+//   return (
+//     <div className="all-complaints-container">
+//       <h2>All Complaints</h2>
+
+//       {complaints.length === 0 ? (
+//         <p>No complaints found</p>
+//       ) : (
+//         <table className="complaints-table">
+//           <thead>
+//             <tr>
+//               <th>Name</th>
+//               <th>Ward</th>
+//               <th>Location</th>
+//               <th>Category</th>
+//               <th>Description</th>
+//               <th>Status</th>
+//             </tr>
+//           </thead>
+
+//           <tbody>
+//             {complaints.map((complaint) => (
+//               <tr key={complaint._id}>
+//                 <td>{complaint.name}</td>
+//                 <td>{complaint.ward}</td>
+//                 <td>{complaint.location}</td>
+//                 <td>{complaint.category}</td>
+//                 <td>{complaint.description}</td>
+
+//                 <td>
+//                   <select
+//                     value={complaint.status}
+//                     onChange={(e) =>
+//                       handleStatusUpdate(complaint._id, e.target.value)
+//                     }
+//                   >
+//                     <option value="Pending">Pending</option>
+//                     <option value="In Progress">In Progress</option>
+//                     <option value="Resolved">Resolved</option>
+//                   </select>
+//                 </td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </table>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default AllComplaints;
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-
+import { complaintsAPI } from "../services/api";
+import "../styles/AllComplaints.css";
 const AllComplaints = () => {
-  const { user } = useAuth();
   const [complaints, setComplaints] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // 🔥 Fetch All Complaints
-  const fetchComplaints = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
-        "http://localhost:5000/api/complaints",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-      setComplaints(data);
-    } catch (error) {
-      console.error("Error fetching complaints:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     fetchComplaints();
   }, []);
 
-  const updateStatus = async (id, status) => {
+  const fetchComplaints = async () => {
     try {
-      const token = localStorage.getItem("token");
-  
-      let resolutionNote = "";
-  
-      if (status === "Resolved") {
-        resolutionNote = prompt("Enter resolution note:");
-  
-        if (!resolutionNote) {
-          alert("Resolution note is required!");
-          return;
-        }
-      }
-  
-      await fetch(
-        `http://localhost:5000/api/complaints/${id}/status`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            status,
-            resolutionNote,
-          }),
-        }
-      );
-  
-      fetchComplaints();
+      const data = await complaintsAPI.getComplaints();
+      setComplaints(data || []);
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error("Error fetching complaints:", error);
+    }
+  };
+
+  const handleStatusUpdate = async (id, status) => {
+    try {
+      await complaintsAPI.updateStatus(id, status);
+
+      // Refresh complaints list
+      const updatedComplaints = await complaintsAPI.getComplaints();
+      setComplaints(updatedComplaints);
+    } catch (error) {
+      console.error("Error updating complaint:", error);
     }
   };
 
   return (
-    <div className="admin-container">
-      <h2 className="admin-title">All Complaints</h2>
-  
+    <div className="all-complaints-container">
+      <h2>All Complaints</h2>
+
       {complaints.length === 0 ? (
-        <p className="no-data">No complaints found.</p>
+        <p>No complaints found</p>
       ) : (
-        complaints.map((complaint) => (
-          <div key={complaint._id} className="complaint-card">
-            <div className="card-header">
-              <h3>{complaint.title || "Complaint"}</h3>
-              <span className={`status ${complaint.status.replace(" ", "-")}`}>
-                {complaint.status}
-              </span>
-            </div>
-  
-            <p>
-              <strong>Description:</strong> {complaint.description}
-            </p>
-  
-            {complaint.resolutionNote && (
-              <p className="resolution">
-                <strong>Resolution:</strong> {complaint.resolutionNote}
-              </p>
-            )}
-  
-            {user?.role === "admin" && (
-              <div className="admin-controls">
-                <select
-                  onChange={(e) =>
-                    updateStatus(complaint._id, e.target.value)
-                  }
-                  defaultValue=""
-                  className="status-select"
-                >
-                  <option value="" disabled>
-                    Update Status
-                  </option>
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Resolved">Resolved</option>
-                </select>
-              </div>
-            )}
-          </div>
-        ))
-      )}
-    </div>
-  ); 
-  return (
-    <div className="admin-container">
-      <h2 className="admin-title">All Complaints</h2>
-  
-      {complaints.length === 0 ? (
-        <p className="no-data">No complaints found.</p>
-      ) : (
-        complaints.map((complaint) => (
-          <div key={complaint._id} className="complaint-card">
-            <div className="card-header">
-              <h3>{complaint.title || "Complaint"}</h3>
-              <span className={`status ${complaint.status.replace(" ", "-")}`}>
-                {complaint.status}
-              </span>
-            </div>
-  
-            <p>
-              <strong>Description:</strong> {complaint.description}
-            </p>
-  
-            {complaint.resolutionNote && (
-              <p className="resolution">
-                <strong>Resolution:</strong> {complaint.resolutionNote}
-              </p>
-            )}
-  
-            {user?.role === "admin" && (
-              <div className="admin-controls">
-                <select
-                  onChange={(e) =>
-                    updateStatus(complaint._id, e.target.value)
-                  }
-                  defaultValue=""
-                  className="status-select"
-                >
-                  <option value="" disabled>
-                    Update Status
-                  </option>
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Resolved">Resolved</option>
-                </select>
-              </div>
-            )}
-          </div>
-        ))
+        <table className="complaints-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Ward</th>
+              <th>Location</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {complaints.map((complaint) => (
+              <tr key={complaint._id}>
+                <td>{complaint.name}</td>
+                <td>{complaint.ward}</td>
+                <td>{complaint.location}</td>
+                <td>{complaint.category}</td>
+                <td>{complaint.description}</td>
+
+                <td>
+                  <select
+                    value={complaint.status}
+                    onChange={(e) =>
+                      handleStatusUpdate(complaint._id, e.target.value)
+                    }
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
-  return (
-    <div className="admin-container">
-      <h2 className="admin-title">All Complaints</h2>
-  
-      {complaints.length === 0 ? (
-        <p className="no-data">No complaints found.</p>
-      ) : (
-        complaints.map((complaint) => (
-          <div key={complaint._id} className="complaint-card">
-            <div className="card-header">
-              <h3>{complaint.title || "Complaint"}</h3>
-              <span className={`status ${complaint.status.replace(" ", "-")}`}>
-                {complaint.status}
-              </span>
-            </div>
-  
-            <p>
-              <strong>Description:</strong> {complaint.description}
-            </p>
-  
-            {complaint.resolutionNote && (
-              <p className="resolution">
-                <strong>Resolution:</strong> {complaint.resolutionNote}
-              </p>
-            )}
-  
-            {user?.role === "admin" && (
-              <div className="admin-controls">
-                <select
-                  onChange={(e) =>
-                    updateStatus(complaint._id, e.target.value)
-                  }
-                  defaultValue=""
-                  className="status-select"
-                >
-                  <option value="" disabled>
-                    Update Status
-                  </option>
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Resolved">Resolved</option>
-                </select>
-              </div>
-            )}
-          </div>
-        ))
-      )}
-    </div>
-  );
-  return (
-    <div className="admin-container">
-      <h2 className="admin-title">All Complaints</h2>
-  
-      {complaints.length === 0 ? (
-        <p className="no-data">No complaints found.</p>
-      ) : (
-        complaints.map((complaint) => (
-          <div key={complaint._id} className="complaint-card">
-            <div className="card-header">
-              <h3>{complaint.title || "Complaint"}</h3>
-              <span className={`status ${complaint.status.replace(" ", "-")}`}>
-                {complaint.status}
-              </span>
-            </div>
-  
-            <p>
-              <strong>Description:</strong> {complaint.description}
-            </p>
-  
-            {complaint.resolutionNote && (
-              <p className="resolution">
-                <strong>Resolution:</strong> {complaint.resolutionNote}
-              </p>
-            )}
-  
-            {user?.role === "admin" && (
-              <div className="admin-controls">
-                <select
-                  onChange={(e) =>
-                    updateStatus(complaint._id, e.target.value)
-                  }
-                  defaultValue=""
-                  className="status-select"
-                >
-                  <option value="" disabled>
-                    Update Status
-                  </option>
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Resolved">Resolved</option>
-                </select>
-              </div>
-            )}
-          </div>
-        ))
-      )}
-    </div>
-  );
-}
+};
+
 export default AllComplaints;

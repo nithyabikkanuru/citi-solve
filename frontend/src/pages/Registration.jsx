@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react'
 import '../styles/Registration.css'
 import {useAuth} from '../context/AuthContext.jsx'
@@ -159,7 +160,7 @@ const Registration = () => {
              onChange={handleChange}
            >
              <option>Citizen</option>
-             <option>Admin</option>
+             <option>admin</option>
            </select>
          </div>
 
@@ -202,4 +203,4 @@ const Registration = () => {
  );
 }
 
-export default Registration
+export default Registration;

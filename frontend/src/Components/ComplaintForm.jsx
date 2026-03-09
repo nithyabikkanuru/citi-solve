@@ -1,4 +1,3 @@
-// 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/ComplaintForm.css";
@@ -34,7 +33,6 @@ const ComplaintForm = () => {
       [e.target.name]: e.target.value,
     }));
 
-    // Clear error while typing
     if (errors[e.target.name]) {
       setErrors((prev) => ({
         ...prev,
@@ -77,21 +75,10 @@ const ComplaintForm = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!formData.ward.trim()) {
-      newErrors.ward = "Ward is required";
-    }
-
-    if (!formData.location.trim()) {
-      newErrors.location = "Location is required";
-    }
-
-    if (!formData.category) {
-      newErrors.category = "Please select a category";
-    }
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.ward.trim()) newErrors.ward = "Ward is required";
+    if (!formData.location.trim()) newErrors.location = "Location is required";
+    if (!formData.category) newErrors.category = "Please select a category";
 
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
@@ -104,36 +91,53 @@ const ComplaintForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
-    // Get old complaints
-    const existingComplaints =
-      JSON.parse(localStorage.getItem("complaints")) || [];
+    try {
+      const token = localStorage.getItem("token");
 
-    // Add new complaint
-    existingComplaints.push(formData);
+      const response = await fetch("http://localhost:5000/api/complaints", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          ward: formData.ward,
+          location: formData.location,
+          category: formData.category,
+          description: formData.description
+        }),
+      });
 
-    // Save to localStorage
-    localStorage.setItem(
-      "complaints",
-      JSON.stringify(existingComplaints)
-    );
+      const data = await response.json();
 
-    // Clear form
-    setFormData({
-      name: "",
-      ward: "",
-      location: "",
-      category: "",
-      description: "",
-      photo: null,
-    });
+      if (!response.ok) {
+        alert(data.message || "Failed to submit complaint");
+        return;
+      }
 
-    // Go to My Complaints
-    navigate("/my-complaints");
+      alert("Complaint submitted successfully");
+
+      setFormData({
+        name: "",
+        ward: "",
+        location: "",
+        category: "",
+        description: "",
+        photo: null,
+      });
+
+      navigate("/my-complaints");
+
+    } catch (error) {
+      console.log(error);
+      alert("Server error while submitting complaint");
+    }
   };
 
   const handleCancel = () => {

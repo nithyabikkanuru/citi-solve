@@ -1,54 +1,53 @@
-// const baseURL = "https://citi-solve-1.onrender.com/api";
-const baseURL = "http://localhost:5000/api";
+import axios from "axios";
 
-const callAPI = async (endpoint, options = {}) => {
-  try {
-    const token = localStorage.getItem("token");
+// Base API instance
+const API = axios.create({
+  baseURL: "http://localhost:5000/api",
+});
 
-    const response = await fetch(`${baseURL}${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-    });
+// Add token automatically to every request
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem("token");
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `HTTP error! status: ${response.status}`
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    throw new Error(error.message || "Network error occurred");
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
   }
-};
 
-// 🔐 AUTH API
+  return req;
+});
+
+// ---------------- AUTH APIs ----------------
 export const authAPI = {
-  login: (data) =>
-    callAPI("/auth/login", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
+  login: async (data) => {
+    const res = await API.post("/auth/login", data);
+    return res.data;
+  },
 
-  register: (data) =>
-    callAPI("/auth/register", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
+  register: async (data) => {
+    const res = await API.post("/auth/register", data);
+    return res.data;
+  },
 };
 
-// 📢 COMPLAINT API
-export const complaintAPI = {
-  getAllComplaints: () => callAPI("/complaints"),
+// ---------------- COMPLAINT APIs ----------------
+export const complaintsAPI = {
+  // Get all complaints
+  getComplaints: async () => {
+    const res = await API.get("/complaints");
+    return res.data;
+  },
 
-  createComplaint: (data) =>
-    callAPI("/complaints", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
+  // Create complaint
+  createComplaint: async (data) => {
+    const res = await API.post("/complaints", data);
+    return res.data;
+  },
+
+  // Update complaint status
+  updateStatus: async (id, status) => {
+    const res = await API.patch(`/complaints/${id}/status`, { status });
+    return res.data;
+  },
 };
+
+export default API;

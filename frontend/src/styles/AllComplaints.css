@@ -1,0 +1,57 @@
+.complaints-container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 30px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  .complaints-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  /* Table */
+  .complaints-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Table Header */
+  .complaints-table thead {
+    background: #2c7be5;
+    color: white;
+  }
+  
+  .complaints-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+  }
+  
+  /* Table Rows */
+  .complaints-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  /* Row Hover */
+  .complaints-table tbody tr:hover {
+    background: #f5f8ff;
+  }
+  
+  /* Status Dropdown */
+  .status-select {
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  
+  .status-select:focus {
+    outline: none;
+    border-color: #2c7be5;
+  }

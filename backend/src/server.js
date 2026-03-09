@@ -1,12 +1,16 @@
+// 
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+dotenv.config();
 import cors from "cors";
+import connectdatabase from "./config/database.js";
+connectdatabase();
 
 import authRoutes from "./routes/authRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
 
-dotenv.config();
+
 
 const app = express();
 
